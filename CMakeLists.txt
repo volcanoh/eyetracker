@@ -12,6 +12,7 @@ include_directories(include)
 set(source
   src/main.cpp
   src/object.cpp
+  src/camera.cpp
 )
 
 add_executable(demo ${source})
