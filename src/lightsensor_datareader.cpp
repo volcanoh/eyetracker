@@ -1,14 +1,14 @@
 #include "lightsensor_datareader.h"
 
-LightSenrosDataReader::LightSenrosDataReader(UsbSerial& usb_serial, int size) :
+LightSensorDataReader::LightSensorDataReader(UsbSerial& usb_serial, int size) :
   usb_serial_(usb_serial),
   size_(size) {
   data_ = new char[size_];
   }
-LightSenrosDataReader::~LightSenrosDataReader() {
+LightSensorDataReader::~LightSensorDataReader() {
   delete[] data_;
 }
-int LightSenrosDataReader::SearchBeginPos(char* buffer, const int size) {
+int LightSensorDataReader::SearchBeginPos(char* buffer, const int size) {
   for (int i = 0; i < size - 1; ++i) {
     if (buffer[i] == '*' && buffer[i + 1] == '#')
       return i;
@@ -16,7 +16,7 @@ int LightSenrosDataReader::SearchBeginPos(char* buffer, const int size) {
   return -1;
 }
 
-bool LightSenrosDataReader::Read() {
+bool LightSensorDataReader::Read() {
   char* buffer = new char[size_];
   usb_serial_.Read(buffer, size_);
   int begin_pos = SearchBeginPos(buffer, size_);
