@@ -13,6 +13,8 @@ set(source
   src/main.cpp
   src/object.cpp
   src/camera.cpp
+  src/serial.cpp
+  src/lightsensor_datareader.cpp
 )
 
 add_executable(demo ${source})

@@ -68,7 +68,7 @@ template<typename T> class RingBuffer {
   size_t end;
   bool wrap;
   std::mutex mtx;
-  size_t getFreeSize() {
+  inline size_t getFreeSize() {
     size_t occ = 0;
     if (end == begin) {
       occ = wrap ? size : 0;
@@ -81,7 +81,7 @@ template<typename T> class RingBuffer {
     }
     return size - occ;
   }
-  size_t getOccupiedSize() {
+  inline size_t getOccupiedSize() {
     if (end == begin) {
       return wrap ? size : 0;
     }
