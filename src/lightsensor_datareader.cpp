@@ -2,12 +2,9 @@
 
 LightSensorDataReader::LightSensorDataReader(UsbSerial& usb_serial, int size) :
   usb_serial_(usb_serial),
-  size_(size) {
-  data_ = new char[size_];
+  lightsensor_datapacket_(size) {
   }
 LightSensorDataReader::~LightSensorDataReader() {
-  if (data_)
-    delete[] data_;
 }
 
 int LightSensorDataReader::SearchBeginPos(char* buffer, const int size) {
@@ -19,34 +16,41 @@ int LightSensorDataReader::SearchBeginPos(char* buffer, const int size) {
 }
 
 bool LightSensorDataReader::CheckDataTail() {
-  if (data_[size_ - 4] == '#' &&
-      data_[size_ - 3] == '*' &&
-      data_[size_ - 2] == '\r' &&
-      data_[size_ - 1] == '\n')
+  if (data_[kSerialDataSize - 4] == '#' &&
+      data_[kSerialDataSize - 3] == '*' &&
+      data_[kSerialDataSize - 2] == '\r' &&
+      data_[kSerialDataSize - 1] == '\n')
     return true;
   return false;
 }
 bool LightSensorDataReader::UpdateData() {
-  char* buffer = new char[size_];
-  usb_serial_.Read(buffer, size_);
-  int begin_pos = SearchBeginPos(buffer, size_);
+  char buffer[kSerialDataSize];
+  usb_serial_.Read(buffer, kSerialDataSize);
+  int begin_pos = SearchBeginPos(buffer, kSerialDataSize);
   if (begin_pos == -1) {
-    delete[] buffer;
     return false;
   }
   else {
-    memcpy(data_, buffer + begin_pos, size_ - begin_pos);
+    memcpy(data_, buffer + begin_pos, kSerialDataSize - begin_pos);
   }
-  usb_serial_.Read(data_ + size_ - begin_pos, begin_pos); // read the rest data.
-  delete[] buffer;
-  return true;
+  usb_serial_.Read(data_ + kSerialDataSize - begin_pos, begin_pos); // read the rest data.
+
+  if (CheckDataTail()) {
+    LightSensorDataPacket lsdp;
+    memcpy(&lsdp, data_ + 2, sizeof(LightSensorDataPacket));
+    if (lightsensor_datapacket_.write(&lsdp, 1) == 1)
+      return true;
+    else {
+      cerr << "ringbuffer is no free" << endl;
+      return false;
+    }
+    return true;
+  }
+  return false;
 }
 
 bool LightSensorDataReader::GetLightSensorDataPacket(LightSensorDataPacket& lsdp) {
-  if (!UpdateData()) return false;
-  if (CheckDataTail()){
-    memcpy(&lsdp, data_ + 2, sizeof(LightSensorDataPacket));
+  if (lightsensor_datapacket_.read(&lsdp, 1) == 1)
     return true;
-  }
   return false;
 }
