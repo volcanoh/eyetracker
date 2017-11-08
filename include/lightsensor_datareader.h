@@ -2,18 +2,20 @@
 #include <iostream>
 using namespace std;
 #include "serial.h"
-class LightSenrosDataReader {
+struct LightSensorDataPacket {
+  unsigned int index;
+  unsigned short timetick[36 * 2];
+};
+class LightSensorDataReader {
  public:
-  LightSenrosDataReader(UsbSerial& usb_serial, int size);
-  ~LightSenrosDataReader();
-  int SearchBeginPos(char* buffer, const int size);
-  bool Read();
-  void Print() {
-    for (int i = 0; i < size_; ++ i) {
-      cout << hex <<(short) data_[i];
-    } cout << endl;
-  }
+  LightSensorDataReader(UsbSerial& usb_serial, int size);
+  ~LightSensorDataReader();
+  bool GetLightSensorDataPacket(LightSensorDataPacket& lsdp);
  private:
+  int SearchBeginPos(char* buffer, const int size);
+  bool CheckDataTail();
+  bool UpdateData();
+
   UsbSerial& usb_serial_;
   int size_;
   char* data_;

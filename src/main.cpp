@@ -1,23 +1,15 @@
 #include "lightsensor_datareader.h"
-class LightSenrosDataInterpretor {
-public:
-  //double TimetickToAngle(unsigned short timetick);
-  //unsigned short AngleToTimetick(double angle);
-private:
-  unsigned int index;
-  unsigned short timetick_[36 * 2];
-
-  double hit_map_[36 * 2]; // 36 pixels's x&y.
-};
-
 int main() {
   UsbSerialLinux usb_serial_linux("/dev/ttyUSB0");
-  LightSenrosDataReader aaa(usb_serial_linux, 154);
+  LightSensorDataReader aaa(usb_serial_linux, 154);
   sleep(1);
+  LightSensorDataPacket lsdp;
   while(1) {
-    if (aaa.Read())
-      aaa.Print();
-    usleep(100000);
+    aaa.GetLightSensorDataPacket(lsdp);
+    cout << lsdp.index << endl;
+    for (int i = 0; i < 36; ++i) {
+      cout << lsdp.timetick[2*i] << "," << lsdp.timetick[2*i + 1] << "  ";
+    }cout << endl << endl;
   }
   usb_serial_linux.Close();
   return 0;
