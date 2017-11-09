@@ -10,13 +10,15 @@ struct LightSensorDataPacket {
   unsigned int index;
   unsigned short timetick[36 * 2];
 };
-class LightSensorDataReader {
+
+class LightSensorDataControler {
  public:
-  LightSensorDataReader(UsbSerial& usb_serial, int size);
-  ~LightSensorDataReader();
+  LightSensorDataControler(UsbSerial& usb_serial, int size = 10);
+  ~LightSensorDataControler();
   bool UpdateData();
   bool GetLightSensorDataPacket(LightSensorDataPacket& lsdp);
  private:
+  std::mutex mtx_;
   int SearchBeginPos(char* buffer, const int size);
   bool CheckDataTail();
 

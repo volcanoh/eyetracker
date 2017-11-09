@@ -1,13 +1,14 @@
-#include "lightsensor_datareader.h"
+#include "lightsensor_datacontroler.h"
 
-LightSensorDataReader::LightSensorDataReader(UsbSerial& usb_serial, int size) :
+LightSensorDataControler::LightSensorDataControler(UsbSerial& usb_serial, int size) :
   usb_serial_(usb_serial),
   lightsensor_datapacket_(size) {
   }
-LightSensorDataReader::~LightSensorDataReader() {
+
+LightSensorDataControler::~LightSensorDataControler() {
 }
 
-int LightSensorDataReader::SearchBeginPos(char* buffer, const int size) {
+int LightSensorDataControler::SearchBeginPos(char* buffer, const int size) {
   for (int i = 0; i < size - 1; ++i) {
     if (buffer[i] == '*' && buffer[i + 1] == '#')
       return i;
@@ -15,7 +16,7 @@ int LightSensorDataReader::SearchBeginPos(char* buffer, const int size) {
   return -1;
 }
 
-bool LightSensorDataReader::CheckDataTail() {
+bool LightSensorDataControler::CheckDataTail() {
   if (data_[kSerialDataSize - 4] == '#' &&
       data_[kSerialDataSize - 3] == '*' &&
       data_[kSerialDataSize - 2] == '\r' &&
@@ -23,7 +24,9 @@ bool LightSensorDataReader::CheckDataTail() {
     return true;
   return false;
 }
-bool LightSensorDataReader::UpdateData() {
+
+bool LightSensorDataControler::UpdateData() {
+  std::lock_guard<std::mutex> lock(mtx_);
   char buffer[kSerialDataSize];
   usb_serial_.Read(buffer, kSerialDataSize);
   int begin_pos = SearchBeginPos(buffer, kSerialDataSize);
@@ -49,7 +52,8 @@ bool LightSensorDataReader::UpdateData() {
   return false;
 }
 
-bool LightSensorDataReader::GetLightSensorDataPacket(LightSensorDataPacket& lsdp) {
+bool LightSensorDataControler::GetLightSensorDataPacket(LightSensorDataPacket& lsdp) {
+  std::lock_guard<std::mutex> lock(mtx_);
   if (lightsensor_datapacket_.read(&lsdp, 1) == 1)
     return true;
   return false;

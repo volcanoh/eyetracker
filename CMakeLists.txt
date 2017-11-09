@@ -14,8 +14,9 @@ set(source
   src/object.cpp
   src/camera.cpp
   src/serial.cpp
-  src/lightsensor_datareader.cpp
+  src/lightsensor_datacontroler.cpp
+  src/lightsensor_dataprocessor.cpp
 )
 
 add_executable(demo ${source})
-target_link_libraries(demo ${OpenCV_LIBS})
+target_link_libraries(demo ${OpenCV_LIBS} pthread)
