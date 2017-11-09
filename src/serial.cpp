@@ -59,6 +59,7 @@ bool UsbSerialLinux::Read(char *buf, int length) {
     }
     else {
       count++;
+      usleep(10000);
       if (count > 500) {
         cout << "error read serial: timeout" << endl;
         return false;

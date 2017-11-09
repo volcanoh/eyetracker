@@ -1,6 +1,6 @@
 #pragma once
 #include <algorithm>
-#include <mutex.h>
+#include <mutex>
 
 template<typename T> class RingBuffer {
  public:
@@ -42,7 +42,7 @@ template<typename T> class RingBuffer {
     return n;
   }
 
-  size_t read(T* data, size_t n) {
+  size_t read(T* dest, size_t n) {
     std::lock_guard<std::mutex> lock(mtx);
     n = min(n, getOccupiedSize());
 
@@ -92,4 +92,4 @@ template<typename T> class RingBuffer {
       return size + end - begin;
     }
   }
-}
+};

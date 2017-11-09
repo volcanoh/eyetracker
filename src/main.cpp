@@ -1,23 +1,43 @@
-#include "lightsensor_datareader.h"
-class LightSenrosDataInterpretor {
-public:
-  //double TimetickToAngle(unsigned short timetick);
-  //unsigned short AngleToTimetick(double angle);
-private:
-  unsigned int index;
-  unsigned short timetick_[36 * 2];
-
-  double hit_map_[36 * 2]; // 36 pixels's x&y.
-};
+#include "lightsensor_dataprocessor.h"
+#include <thread>
 
 int main() {
+
+  std::vector<std::thread> threads;
+
   UsbSerialLinux usb_serial_linux("/dev/ttyUSB0");
-  LightSenrosDataReader aaa(usb_serial_linux, 154);
+
+  std::shared_ptr<LightSensorDataControler> p_lsdc(new LightSensorDataControler(usb_serial_linux));
+
+  LightSensorDataProcessor lsdp(p_lsdc);
+
   sleep(1);
-  while(1) {
-    if (aaa.Read())
-      aaa.Print();
-    usleep(100000);
+  threads.push_back(std::thread([&]() {
+        while(true) {
+          if (p_lsdc->UpdateData()) {
+            cout << "update data" << endl;
+            usleep(1);
+          }
+        }
+      }));
+
+  threads.push_back(std::thread([&]() {
+        LightSensorCallback cb = [&](LightSensorDataPacket& lsd) {
+          cout << lsd.index << endl;
+          for (int i = 0; i < 36; ++i) {
+            cout << lsd.timetick[2*i] << "," << lsd.timetick[2*i + 1] << "  ";
+          } cout << endl << endl;
+        };
+        lsdp.RegisterCallback(cb);
+        lsdp.LoopProcess();
+      }));
+
+  threads.push_back(std::thread([&]() {
+        sleep(10);
+        lsdp.Stop();
+      }));
+  for (auto& thread : threads) {
+    thread.join();
   }
   usb_serial_linux.Close();
   return 0;

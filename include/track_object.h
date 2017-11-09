@@ -8,5 +8,4 @@ class TrackObject : public Object {
 
   int vertexNumber;
   std::vector<cv::Point3d> vertices;
-  std::vector<cv::Point2d> hitMap;
 }
