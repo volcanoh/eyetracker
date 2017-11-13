@@ -19,14 +19,15 @@ void TrackObject::StartTracking() {
     double y = tan(angle_y);
     return cv::Point2d(x, y);
   };
-  std::vector<cv::Point2d> image_points;
-  std::vector<cv::Point3d> object_points;
-
   LightSensorCallback cb = [&](LightSensorDataPacket& lsd) {
     cout << lsd.index << endl;
-    for (int i = 0; i < 36; ++i) {
+    std::vector<cv::Point2d> image_points;
+    std::vector<cv::Point3d> object_points;
+
+    for (int i = 0; i < 32; ++i) {
       if (lsd.timetick[2*i] == 0 || lsd.timetick[2*i+1] == 0)
         continue;
+      // cout << lsd.timetick[2*i] << "," << lsd.timetick[2*i+1] << "  ";
       double angle_x = TimetickToAngle(lsd.timetick[2*i]);
       double angle_y = TimetickToAngle(lsd.timetick[2*i + 1]);
 
@@ -35,7 +36,9 @@ void TrackObject::StartTracking() {
       image_points.push_back(img_pt);
       object_points.push_back(obj_pt);
     } cout << endl << endl;
-    cv::solvePnP(object_points, image_points, cv::Matx33d::eye(), cv::Mat(), rvecTrack, tvecTrack, true, cv::SOLVEPNP_ITERATIVE);
+    //cv::solvePnP(object_points, image_points, cv::Matx33d::eye(), cv::Mat(), rvecTrack, tvecTrack, true, cv::SOLVEPNP_ITERATIVE);
+    cv::solvePnP(object_points, image_points, cv::Matx33d::eye(), cv::Mat(), rvecTrack, tvecTrack, false, cv::SOLVEPNP_EPNP);
+    cout << "tvec:\n " << tvecTrack << endl << "rvec:\n" << rvecTrack << endl << endl;
   };
   p_lightsensor_data_processor_->RegisterCallback(cb);
   p_lightsensor_data_processor_->LoopProcess();

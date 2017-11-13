@@ -18,7 +18,6 @@ bool ReadPoints(std::vector<cv::Point3d>& pts, std::string file) {
 
 int main() {
 
-
   UsbSerialLinux usb_serial_linux("/dev/ttyUSB0");
   std::shared_ptr<LightSensorDataControler> p_lsdc(new LightSensorDataControler(usb_serial_linux));
 
@@ -27,7 +26,7 @@ int main() {
   TrackObject track_object(p_lsdc, p_lsdp);
 
   std::vector<cv::Point3d> vertices;
-  ReadPoints(vertices, "object_points.txt");
+  if (!ReadPoints(vertices, "object_points.txt")) return -1;
   track_object.SetVertices(vertices);
 
   sleep(1);

@@ -11,8 +11,8 @@ class TrackObject : public Object {
   void SetVertices(const std::vector<cv::Point3d>& vertices);
 
  private:
-  cv::Mat rvecTrack;
-  cv::Mat tvecTrack;
+  cv::Matx31d rvecTrack;
+  cv::Matx31d tvecTrack;
 
   std::vector<cv::Point3d> vertices_;
   std::shared_ptr<LightSensorDataControler> p_lightsensor_data_controler_;
