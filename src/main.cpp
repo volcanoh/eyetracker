@@ -1,4 +1,5 @@
 #include "lightsensor_dataprocessor.h"
+#include "track_object.h"
 #include <thread>
 
 int main() {
@@ -6,10 +7,9 @@ int main() {
   std::vector<std::thread> threads;
 
   UsbSerialLinux usb_serial_linux("/dev/ttyUSB0");
-
   std::shared_ptr<LightSensorDataControler> p_lsdc(new LightSensorDataControler(usb_serial_linux));
-
-  LightSensorDataProcessor lsdp(p_lsdc);
+  std::shared_ptr<LightSensorDataProcessor> p_lsdp(new LightSensorDataProcessor(p_lsdc));
+  TrackObject track_object(p_lsdc, p_lsdp);
 
   sleep(1);
   threads.push_back(std::thread([&]() {
@@ -22,19 +22,12 @@ int main() {
       }));
 
   threads.push_back(std::thread([&]() {
-        LightSensorCallback cb = [&](LightSensorDataPacket& lsd) {
-          cout << lsd.index << endl;
-          for (int i = 0; i < 36; ++i) {
-            cout << lsd.timetick[2*i] << "," << lsd.timetick[2*i + 1] << "  ";
-          } cout << endl << endl;
-        };
-        lsdp.RegisterCallback(cb);
-        lsdp.LoopProcess();
+        track_object.StartTracking();
       }));
 
   threads.push_back(std::thread([&]() {
         sleep(10);
-        lsdp.Stop();
+        track_object.Stop();
       }));
   for (auto& thread : threads) {
     thread.join();
