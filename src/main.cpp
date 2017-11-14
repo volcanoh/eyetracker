@@ -1,17 +1,36 @@
 #include "lightsensor_dataprocessor.h"
+#include "track_object.h"
 #include <thread>
+#include <fstream>
+
+bool ReadPoints(std::vector<cv::Point3d>& pts, std::string file) {
+  int nums = 0;
+  ifstream fin(file, fstream::in);
+  if (!fin.is_open()) return false;
+  fin >> nums;
+  double x = 0, y = 0, z = 0;
+  for (int i = 0; i < nums; ++i) {
+    fin >> x >> y >> z;
+    pts.push_back(cv::Point3d(x, y, z));
+  }
+  return true;
+}
 
 int main() {
 
-  std::vector<std::thread> threads;
-
   UsbSerialLinux usb_serial_linux("/dev/ttyUSB0");
-
   std::shared_ptr<LightSensorDataControler> p_lsdc(new LightSensorDataControler(usb_serial_linux));
 
-  LightSensorDataProcessor lsdp(p_lsdc);
+  std::shared_ptr<LightSensorDataProcessor> p_lsdp(new LightSensorDataProcessor(p_lsdc));
+
+  TrackObject track_object(p_lsdc, p_lsdp);
+
+  std::vector<cv::Point3d> vertices;
+  if (!ReadPoints(vertices, "object_points.txt")) return -1;
+  track_object.SetVertices(vertices);
 
   sleep(1);
+  std::vector<std::thread> threads;
   threads.push_back(std::thread([&]() {
         while(true) {
           if (p_lsdc->UpdateData()) {
@@ -22,19 +41,12 @@ int main() {
       }));
 
   threads.push_back(std::thread([&]() {
-        LightSensorCallback cb = [&](LightSensorDataPacket& lsd) {
-          cout << lsd.index << endl;
-          for (int i = 0; i < 36; ++i) {
-            cout << lsd.timetick[2*i] << "," << lsd.timetick[2*i + 1] << "  ";
-          } cout << endl << endl;
-        };
-        lsdp.RegisterCallback(cb);
-        lsdp.LoopProcess();
+        track_object.StartTracking();
       }));
 
   threads.push_back(std::thread([&]() {
         sleep(10);
-        lsdp.Stop();
+        track_object.Stop();
       }));
   for (auto& thread : threads) {
     thread.join();

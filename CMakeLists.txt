@@ -16,6 +16,7 @@ set(source
   src/serial.cpp
   src/lightsensor_datacontroler.cpp
   src/lightsensor_dataprocessor.cpp
+  src/track_object.cpp
 )
 
 add_executable(demo ${source})
