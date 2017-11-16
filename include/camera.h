@@ -5,22 +5,22 @@
 class Camera : public Object {
 public:
   Camera(int id);
-  void setId(int id);
-  int getId();
+  void SetId(int id);
+  int GetId();
 
-  bool open();
-  void close();
-  bool isOpened();
+  bool Open();
+  void Close();
+  bool IsOpened();
 
-  void getCameraMatrix(cv::Mat& camMat);
-  void setCameraMatrix(const cv::Mat& camMat);
+  void GetCameraMatrix(cv::Mat& camMat);
+  void SetCameraMatrix(const cv::Mat& camMat);
 
-  void getImage(cv::Mat& image);
-  Camera& operator >> (cv::Mat& image);
+  void GetImage(cv::Mat& image);
+  void operator >> (cv::Mat& image);
 
  private:
-  int id;
+  int id_;
 
-  cv::VideoCapture videoCapture;
-  cv::Mat cameraMatrix;
+  cv::VideoCapture videoCapture_;
+  cv::Mat cameraMatrix_;
 };

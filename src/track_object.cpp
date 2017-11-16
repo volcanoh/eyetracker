@@ -5,6 +5,11 @@ TrackObject::TrackObject(std::shared_ptr<LightSensorDataControler> p_lsdc, std::
   p_lightsensor_data_processor_(p_lsdp) {
   }
 
+TrackObject::TrackObject(std::shared_ptr<LightSensorDataControler> p_lsdc, std::shared_ptr<LightSensorDataProcessor> p_lsdp, const std::vector<cv::Point3d>& vertices) :
+  p_lightsensor_data_controler_(p_lsdc),
+  p_lightsensor_data_processor_(p_lsdp),
+  vertices_(vertices){
+  }
 void TrackObject::StartTracking() {
 
   auto TimetickToAngle = [](unsigned short timetick)->double {
@@ -36,8 +41,9 @@ void TrackObject::StartTracking() {
       image_points.push_back(img_pt);
       object_points.push_back(obj_pt);
     } cout << endl << endl;
-    //cv::solvePnP(object_points, image_points, cv::Matx33d::eye(), cv::Mat(), rvecTrack, tvecTrack, true, cv::SOLVEPNP_ITERATIVE);
+    //cv::solvePnP(object_points, image_points, cv::Matx33d::eye(), cv::Mat(), rvecTrack, tvecTrack, false, cv::SOLVEPNP_ITERATIVE);
     cv::solvePnP(object_points, image_points, cv::Matx33d::eye(), cv::Mat(), rvecTrack, tvecTrack, false, cv::SOLVEPNP_EPNP);
+    //cv::solvePnPRansac(object_points, image_points, cv::Matx33d::eye(), cv::Mat(), rvecTrack, tvecTrack, false, 100, 8.0, 100);
     cout << "tvec:\n " << tvecTrack << endl << "rvec:\n" << rvecTrack << endl << endl;
   };
   p_lightsensor_data_processor_->RegisterCallback(cb);

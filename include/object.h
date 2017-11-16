@@ -4,14 +4,14 @@
 class Object {
 public:
 
-  void getRvec(cv::Mat& rv);
-  void setRvec(const cv::Mat& rv);
+  void getRvec(cv::Matx31d& rv);
+  void setRvec(const cv::Matx31d& rv);
 
-  void getTvec(cv::Mat& tv);
-  void setTvec(const cv::Mat& tv);
+  void getTvec(cv::Matx31d& tv);
+  void setTvec(const cv::Matx31d& tv);
 
 private:
-  cv::Mat rvec;
-  cv::Mat tvec;
+  cv::Matx31d rvec;
+  cv::Matx31d tvec;
 };
 
