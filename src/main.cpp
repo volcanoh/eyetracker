@@ -3,7 +3,6 @@
 #include <thread>
 #include <fstream>
 
-#define Sleep(a) usleep(1000*a)
 void SleepMs(int time) {
 #ifdef __unix
   usleep(1000*time);

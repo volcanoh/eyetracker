@@ -24,11 +24,11 @@ template<typename T> class RingBuffer {
 
   size_t write(const T* data, size_t n) {
     std::lock_guard<std::mutex> lock(mtx);
-    n = std::min(n, getFreeSize());
+    n = std::min<size_t>(n, getFreeSize());
 
     if (n == 0) return n;
 
-    const size_t first_chunk = (std::min)(n, size - end);
+    const size_t first_chunk = std::min<size_t>(n, size - end);
     memcpy(buffer + end, data, first_chunk * sizeof(T) );
     end = (end + first_chunk) % size;
 
@@ -44,12 +44,12 @@ template<typename T> class RingBuffer {
 
   size_t read(T* dest, size_t n) {
     std::lock_guard<std::mutex> lock(mtx);
-    n = min(n, getOccupiedSize());
+    n = min<size_t>(n, getOccupiedSize());
 
     if (n == 0) return n;
     if (wrap) wrap = false;
 
-    const size_t first_chunk = std::min(n, size - begin);
+    const size_t first_chunk = std::min<size_t>(n, size - begin);
     memcpy(dest, buffer + begin, first_chunk * sizeof(T));
     begin = (begin + first_chunk) % size;
 
