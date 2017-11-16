@@ -6,6 +6,8 @@ using namespace std;
 #include <unistd.h>     // UNIX standard function definitions
 #include <fcntl.h>      // File control definitions
 #include <termios.h>    // POSIX terminal control definitions
+#elif defined(_WIN32)
+#include <windows.h> 
 #endif
 
 
@@ -32,5 +34,22 @@ public:
   }
 private:
   int fd_;
+};
+
+#elif defined(_WIN32)
+class UsbSerialWin :public UsbSerial {
+public:
+	UsbSerialWin(string device);
+	UsbSerialWin();
+	int Open(string device);
+	bool Read(char* buf, int length);
+	bool Close();
+
+	bool IsOpened() {
+		return h_comm_ != nullptr ? true : false;
+	}
+private:
+	HANDLE h_comm_;
+	OVERLAPPED over_lapped_;
 };
 #endif

@@ -3,6 +3,16 @@
 #include <thread>
 #include <fstream>
 
+#define Sleep(a) usleep(1000*a)
+void SleepMs(int time) {
+#ifdef __unix
+  usleep(1000*time);
+#elif defined _WIN32
+  Sleep(time);
+#endif
+}
+
+
 bool ReadPoints(std::vector<cv::Point3d>& pts, std::string file) {
   int nums = 0;
   ifstream fin(file, fstream::in);
@@ -17,27 +27,32 @@ bool ReadPoints(std::vector<cv::Point3d>& pts, std::string file) {
 }
 
 int main() {
-
-  UsbSerialLinux usb_serial_linux("/dev/ttyUSB0");
-
-  std::shared_ptr<LightSensorDataControler> p_lsdc(new LightSensorDataControler(usb_serial_linux));
+#ifdef __unix
+  UsbSerialLinux usb_serial("/dev/ttyUSB0");
+#elif defined _WIN32
+	UsbSerialWin usb_serial("COM3");
+#endif
+  std::shared_ptr<LightSensorDataControler> p_lsdc(new LightSensorDataControler(usb_serial));
 
   std::shared_ptr<LightSensorDataProcessor> p_lsdp(new LightSensorDataProcessor(p_lsdc));
 
-  std::vector<cv::Point3d> vertices;
-  if (!ReadPoints(vertices, "object_points.txt")) {
-    cout << "can not open file" << endl;
-    return -1;
-  }
-  TrackObject track_object(p_lsdc, p_lsdp, vertices);
+  TrackObject track_object(p_lsdc, p_lsdp);
 
-  sleep(1);
+  std::vector<cv::Point3d> vertices;
+	string object_points_file = "object_points.txt";
+	if (!ReadPoints(vertices, object_points_file)) {
+		cout << "Can not find file: " << object_points_file << endl;
+		return -1;
+	}
+  track_object.SetVertices(vertices);
+
+  SleepMs(1);
   std::vector<std::thread> threads;
   threads.push_back(std::thread([&]() {
         while(true) {
           if (p_lsdc->UpdateData()) {
             cout << "update data" << endl;
-            usleep(1);
+            SleepMs(1);
           }
         }
       }));
@@ -47,14 +62,12 @@ int main() {
       }));
 
   threads.push_back(std::thread([&]() {
-        sleep(10);
+        SleepMs(10000);
         track_object.Stop();
       }));
-
   for (auto& thread : threads) {
     thread.join();
   }
-
-  usb_serial_linux.Close();
+	usb_serial.Close();
   return 0;
 }

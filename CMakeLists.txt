@@ -20,4 +20,9 @@ set(source
 )
 
 add_executable(demo ${source})
+
+IF (WIN32)
+target_link_libraries(demo ${OpenCV_LIBS})
+ELSEIF (UNIX)
 target_link_libraries(demo ${OpenCV_LIBS} pthread)
+ENDIF ()

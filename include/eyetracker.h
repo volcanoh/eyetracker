@@ -3,11 +3,9 @@
 
 class EyeTracker : public TrackObject {
  private:
-  Camera leftEyeCamera;
-  Camera rightEyeCamera;
-  Camera leftSceneCamera;
-  Camera rightSceneCamera;
-
-  LightRecevier lighthouseRecevier;
+  Camera& leftEyeCamera;
+  Camera& rightEyeCamera;
+  Camera& leftSceneCamera;
+  Camera& rightSceneCamera;
 };
 
