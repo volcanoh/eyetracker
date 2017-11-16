@@ -1,44 +1,43 @@
 #include "camera.h"
 
-void Camera::setId(int id) {
-  this->id = id;
+void Camera::SetId(int id) {
+  this->id_ = id;
 }
-int Camera::getId() {
-  return id;
+int Camera::GetId() {
+  return id_;
 }
 
-bool Camera::open() {
-  if (!videoCapture.open(id)) {
-    std::cerr << "open device camera: " << id << " failed!" << std::endl;
+bool Camera::Open() {
+  if (!videoCapture_.open(id_)) {
+    std::cerr << "open device camera: " << id_ << " failed!" << std::endl;
     return false;
   }
   else return true;
 }
-void Camera::close() {
-  videoCapture.release();
+void Camera::Close() {
+  videoCapture_.release();
 }
 
-bool Camera::isOpened() {
-  return videoCapture.isOpened();
+bool Camera::IsOpened() {
+  return videoCapture_.isOpened();
 }
 
-void Camera::getCameraMatrix( cv::Mat &camMat ) {
-  camMat = cameraMatrix;
+void Camera::GetCameraMatrix( cv::Mat &camMat ) {
+  camMat = cameraMatrix_;
 }
-void Camera::setCameraMatrix( const cv::Mat &camMat ) {
-  cameraMatrix = camMat;
+void Camera::SetCameraMatrix( const cv::Mat &camMat ) {
+  cameraMatrix_ = camMat;
 }
-void Camera::getImage( cv::Mat &image ) {
-  if (!isOpened()) {
-    std::cerr << "camera " << id << "is not opened!" << std::endl;
+void Camera::GetImage( cv::Mat &image ) {
+  if (!IsOpened()) {
+    std::cerr << "camera " << id_ << "is not opened!" << std::endl;
     return;
   }
-  videoCapture >> image;
+  videoCapture_ >> image;
 }
-Camera& Camera::operator>>(cv::Mat &image) {
-  getImage(image);
-  return *this;
+void Camera::operator >>(cv::Mat &image) {
+  GetImage(image);
 }
-Camera::Camera(int id) : id(id) {
+Camera::Camera(int id) : id_(id) {
 }
 
