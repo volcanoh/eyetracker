@@ -5,7 +5,10 @@ const double PI = 3.1415926;
 
 class TrackObject : public Object {
  public:
+
   TrackObject(std::shared_ptr<LightSensorDataControler> p_lsdc, std::shared_ptr<LightSensorDataProcessor> p_lsdp);
+
+  TrackObject(std::shared_ptr<LightSensorDataControler> p_lsdc, std::shared_ptr<LightSensorDataProcessor> p_lsdp, const std::vector<cv::Point3d>& vertices);
   void StartTracking();
   void Stop();
   void SetVertices(const std::vector<cv::Point3d>& vertices);
