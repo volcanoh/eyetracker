@@ -1,5 +1,6 @@
 #include "lightsensor_dataprocessor.h"
 #include "track_object.h"
+#include "object_manager.h"
 #include <thread>
 #include <fstream>
 
@@ -36,6 +37,10 @@ int main() {
   std::shared_ptr<LightSensorDataProcessor> p_lsdp(new LightSensorDataProcessor(p_lsdc));
 
   TrackObject track_object(p_lsdc, p_lsdp);
+
+  // ObjectManager test
+  ObjectManager &object_manager = ObjectManager::GetInstance();
+  object_manager.RegisterObject(&track_object);
 
   std::vector<cv::Point3d> vertices;
 	string object_points_file = "object_points.txt";

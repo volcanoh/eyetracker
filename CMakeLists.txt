@@ -17,6 +17,7 @@ set(source
   src/lightsensor_datacontroler.cpp
   src/lightsensor_dataprocessor.cpp
   src/track_object.cpp
+  src/object_manager.cpp
 )
 
 add_executable(demo ${source})
