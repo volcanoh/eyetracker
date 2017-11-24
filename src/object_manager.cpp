@@ -27,7 +27,7 @@ void ObjectManager::SetTransformation(int id1, int id2, const cv::Matx31d& rvec,
   transformation_maps_[id_pair] = mat_rt;
 }
 
-void ObjectManager::GetTransformation(int id1, int id2, cv::Matx31d& rvec, cv::Matx31d& tvec) {
+bool ObjectManager::GetTransformation(int id1, int id2, cv::Matx31d& rvec, cv::Matx31d& tvec) {
   IdPair id_pair = std::make_pair(id1, id2);
 
   auto it = transformation_maps_.find(id_pair);

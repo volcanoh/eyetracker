@@ -28,7 +28,7 @@ class ObjectManager {
   int RegisterObject(Object*);
 
   void SetTransformation(int id1, int id2, const cv::Matx31d& rvec, const cv::Matx31d& tvec);
-  void GetTransformation(int id1, int id2, cv::Matx31d& rvec, cv::Matx31d& tvec);
+  bool GetTransformation(int id1, int id2, cv::Matx31d& rvec, cv::Matx31d& tvec);
 
  private:
   static ObjectManager instance_;
