@@ -10,6 +10,7 @@ ObjectManager::~ObjectManager() {
 ObjectManager ObjectManager::instance_;
 
 int ObjectManager::RegisterObject(Object* object) {
+  if (!object) return -1;
   int id = CreateObjectId();
   object->SetId(id);
   objects_[id] = object;
