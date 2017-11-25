@@ -31,8 +31,9 @@ int main() {
 #ifdef __unix
   UsbSerialLinux usb_serial("/dev/ttyUSB0");
 #elif defined _WIN32
-	UsbSerialWin usb_serial("COM3");
+  UsbSerialWin usb_serial("COM3");
 #endif
+  if (!usb_serial.IsOpened()) return -1;
   std::shared_ptr<LightSensorDataControler> p_lsdc(new LightSensorDataControler(usb_serial));
 
   std::shared_ptr<LightSensorDataProcessor> p_lsdp(new LightSensorDataProcessor(p_lsdc));
@@ -50,35 +51,35 @@ int main() {
   EyeTracker eye_tracker(p_lsdc, p_lsdp, p_left_eye_camera, p_right_eye_camera, p_left_scene_camera, p_right_scene_camera);
 
   std::vector<cv::Point3d> vertices;
-	string object_points_file = "object_points.txt";
-	if (!ReadPoints(vertices, object_points_file)) {
-		cout << "Can not find file: " << object_points_file << endl;
-		return -1;
-	}
+  string object_points_file = "object_points.txt";
+  if (!ReadPoints(vertices, object_points_file)) {
+    cout << "Can not find file: " << object_points_file << endl;
+    return -1;
+  }
   eye_tracker.SetVertices(vertices);
 
   SleepMs(1);
   std::vector<std::thread> threads;
   threads.push_back(std::thread([&]() {
-        while(true) {
-          if (p_lsdc->UpdateData()) {
-            cout << "update data" << endl;
-            SleepMs(1);
-          }
-        }
-      }));
+    while(true) {
+      if (p_lsdc->UpdateData()) {
+        cout << "update data" << endl;
+        SleepMs(1);
+      }
+    }
+  }));
 
   threads.push_back(std::thread([&]() {
-        eye_tracker.StartTracking();
-      }));
+    eye_tracker.StartTracking();
+  }));
 
   threads.push_back(std::thread([&]() {
-        SleepMs(10000);
-        eye_tracker.StopTracking();
-      }));
+    SleepMs(10000);
+    eye_tracker.StopTracking();
+  }));
   for (auto& thread : threads) {
     thread.join();
   }
-	usb_serial.Close();
+  usb_serial.Close();
   return 0;
 }
