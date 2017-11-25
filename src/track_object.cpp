@@ -6,9 +6,9 @@ TrackObject::TrackObject(std::shared_ptr<LightSensorDataControler> p_lsdc, std::
   }
 
 TrackObject::TrackObject(std::shared_ptr<LightSensorDataControler> p_lsdc, std::shared_ptr<LightSensorDataProcessor> p_lsdp, const std::vector<cv::Point3d>& vertices) :
+  vertices_(vertices),
   p_lightsensor_data_controler_(p_lsdc),
-  p_lightsensor_data_processor_(p_lsdp),
-  vertices_(vertices){
+  p_lightsensor_data_processor_(p_lsdp) {
   }
 void TrackObject::StartTracking() {
 
@@ -50,7 +50,7 @@ void TrackObject::StartTracking() {
   p_lightsensor_data_processor_->LoopProcess();
 }
 
-void TrackObject::Stop() {
+void TrackObject::StopTracking() {
   p_lightsensor_data_processor_->Stop();
 }
 

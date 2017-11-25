@@ -18,6 +18,7 @@ set(source
   src/lightsensor_dataprocessor.cpp
   src/track_object.cpp
   src/object_manager.cpp
+  src/eyetracker.cpp
 )
 
 add_executable(demo ${source})

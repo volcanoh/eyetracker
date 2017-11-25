@@ -1,6 +1,7 @@
-#include "lightsensor_dataprocessor.h"
-#include "track_object.h"
-#include "object_manager.h"
+#include <lightsensor_dataprocessor.h>
+#include <track_object.h>
+#include <object_manager.h>
+#include <eyetracker.h>
 #include <thread>
 #include <fstream>
 
@@ -36,11 +37,13 @@ int main() {
 
   std::shared_ptr<LightSensorDataProcessor> p_lsdp(new LightSensorDataProcessor(p_lsdc));
 
-  TrackObject track_object(p_lsdc, p_lsdp);
+  std::shared_ptr<Camera> p_left_eye_camera(new Camera(0));
+  std::shared_ptr<Camera> p_right_eye_camera(new Camera(1));
+  std::shared_ptr<Camera> p_left_scene_camera(new Camera(2));
+  std::shared_ptr<Camera> p_right_scene_camera(new Camera(3));
 
   // ObjectManager test
-  ObjectManager &object_manager = ObjectManager::GetInstance();
-  object_manager.RegisterObject(&track_object);
+  EyeTracker eye_tracker(p_lsdc, p_lsdp, p_left_eye_camera, p_right_eye_camera, p_left_scene_camera, p_right_scene_camera);
 
   std::vector<cv::Point3d> vertices;
 	string object_points_file = "object_points.txt";
@@ -48,7 +51,7 @@ int main() {
 		cout << "Can not find file: " << object_points_file << endl;
 		return -1;
 	}
-  track_object.SetVertices(vertices);
+  eye_tracker.SetVertices(vertices);
 
   SleepMs(1);
   std::vector<std::thread> threads;
@@ -62,12 +65,12 @@ int main() {
       }));
 
   threads.push_back(std::thread([&]() {
-        track_object.StartTracking();
+        eye_tracker.StartTracking();
       }));
 
   threads.push_back(std::thread([&]() {
         SleepMs(10000);
-        track_object.Stop();
+        eye_tracker.StopTracking();
       }));
   for (auto& thread : threads) {
     thread.join();
