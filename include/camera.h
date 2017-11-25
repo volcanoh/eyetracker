@@ -4,8 +4,9 @@
 
 class Camera : public Object {
 public:
-  Camera(int id);
-  void SetId(int id);
+  Camera(int idx);
+  Camera(Camera&);
+  void SetId(int idx);
   int GetId();
 
   bool Open();
@@ -16,10 +17,10 @@ public:
   void SetCameraMatrix(const cv::Mat& camMat);
 
   void GetImage(cv::Mat& image);
-  void operator >> (cv::Mat& image);
+  Camera& operator >> (cv::Mat& image);
 
  private:
-  int id_;
+  int index_;
 
   cv::VideoCapture videoCapture_;
   cv::Mat cameraMatrix_;

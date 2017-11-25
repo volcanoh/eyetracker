@@ -37,10 +37,14 @@ int main() {
 
   std::shared_ptr<LightSensorDataProcessor> p_lsdp(new LightSensorDataProcessor(p_lsdc));
 
-  std::shared_ptr<Camera> p_left_eye_camera(new Camera(0));
-  std::shared_ptr<Camera> p_right_eye_camera(new Camera(1));
-  std::shared_ptr<Camera> p_left_scene_camera(new Camera(2));
-  std::shared_ptr<Camera> p_right_scene_camera(new Camera(3));
+  int left_eye_camera_id = 0;
+  int right_eye_camera_id = 1;
+  int left_scene_camera_id = 2;
+  int right_scene_camera_id = 3;
+  std::shared_ptr<Camera> p_left_eye_camera(new Camera(left_eye_camera_id));
+  std::shared_ptr<Camera> p_right_eye_camera(new Camera(right_eye_camera_id));
+  std::shared_ptr<Camera> p_left_scene_camera(new Camera(left_scene_camera_id));
+  std::shared_ptr<Camera> p_right_scene_camera(new Camera(right_scene_camera_id));
 
   // ObjectManager test
   EyeTracker eye_tracker(p_lsdc, p_lsdp, p_left_eye_camera, p_right_eye_camera, p_left_scene_camera, p_right_scene_camera);
