@@ -1,15 +1,15 @@
 #include "camera.h"
 
-void Camera::SetId(int id) {
-  this->id_ = id;
+void Camera::SetId(int idx) {
+  this->index_ = idx;
 }
 int Camera::GetId() {
-  return id_;
+  return index_;
 }
 
 bool Camera::Open() {
-  if (!videoCapture_.open(id_)) {
-    std::cerr << "open device camera: " << id_ << " failed!" << std::endl;
+  if (!videoCapture_.open(index_)) {
+    std::cerr << "open device camera: " << index_ << " failed!" << std::endl;
     return false;
   }
   else return true;
@@ -30,14 +30,18 @@ void Camera::SetCameraMatrix( const cv::Mat &camMat ) {
 }
 void Camera::GetImage( cv::Mat &image ) {
   if (!IsOpened()) {
-    std::cerr << "camera " << id_ << "is not opened!" << std::endl;
+    std::cerr << "camera " << index_ << "is not opened!" << std::endl;
     return;
   }
   videoCapture_ >> image;
 }
-void Camera::operator >>(cv::Mat &image) {
+Camera& Camera::operator >>(cv::Mat &image) {
   GetImage(image);
+  return *this;
 }
-Camera::Camera(int id) : id_(id) {
+Camera::Camera(int idx) : index_(idx) {
 }
 
+Camera::Camera(Camera& c) {
+  this->index_ = c.index_;
+}
