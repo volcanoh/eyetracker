@@ -5,91 +5,92 @@
 template<typename T> class RingBuffer {
  public:
   explicit RingBuffer(size_t size)
-    : size(size)
-    , begin(0)
-    , end(0)
-    , wrap(false) {
-    buffer = new T[size];
+    : size_(size)
+    , begin_(0)
+    , end_(0)
+    , wrap_(false) {
+    buffer_ = new T[size_];
   }
   RingBuffer(const RingBuffer<T> & rb) {
-    this(rb.size);
-    begin = rb.begin;
-    end = rb.end;
-    memcpy(buffer, rb.buffer, sizeof(T) * size);
+    //this(rb.size_);
+    size_ = rb.size_;
+    begin_ = rb.begin_;
+    end_ = rb.end_;
+    memcpy(buffer_, rb.buffer_, sizeof(T) * size_);
   }
 
   ~RingBuffer() {
-    delete[] buffer;
+    delete[] buffer_;
   }
 
-  size_t write(const T* data, size_t n) {
-    std::lock_guard<std::mutex> lock(mtx);
-    n = std::min<size_t>(n, getFreeSize());
+  size_t Write(const T* data, size_t n) {
+    std::lock_guard<std::mutex> lock(mtx_);
+    n = std::min<size_t>(n, GetFreeSize());
 
     if (n == 0) return n;
 
-    const size_t first_chunk = std::min<size_t>(n, size - end);
-    memcpy(buffer + end, data, first_chunk * sizeof(T) );
-    end = (end + first_chunk) % size;
+    const size_t first_chunk = std::min<size_t>(n, size_ - end_);
+    memcpy(buffer_ + end_, data, first_chunk * sizeof(T) );
+    end_ = (end_ + first_chunk) % size_;
 
     if (first_chunk < n) {
       const size_t second_chunk = n - first_chunk;
-      memcpy(buffer + end, data + first_chunk, second_chunk * sizeof(T));
-      end = (end + second_chunk) % size;
+      memcpy(buffer_ + end_, data + first_chunk, second_chunk * sizeof(T));
+      end_ = (end_ + second_chunk) % size_;
     }
 
-    if (begin == end) wrap = true;
+    if (begin_ == end_) wrap_ = true;
     return n;
   }
 
-  size_t read(T* dest, size_t n) {
-    std::lock_guard<std::mutex> lock(mtx);
-    n = min<size_t>(n, getOccupiedSize());
+  size_t Read(T* dest, size_t n) {
+    std::lock_guard<std::mutex> lock(mtx_);
+    n = std::min<size_t>(n, GetOccupiedSize());
 
     if (n == 0) return n;
-    if (wrap) wrap = false;
+    if (wrap_) wrap_ = false;
 
-    const size_t first_chunk = std::min<size_t>(n, size - begin);
-    memcpy(dest, buffer + begin, first_chunk * sizeof(T));
-    begin = (begin + first_chunk) % size;
+    const size_t first_chunk = std::min<size_t>(n, size_ - begin_);
+    memcpy(dest, buffer_ + begin_, first_chunk * sizeof(T));
+    begin_ = (begin_ + first_chunk) % size_;
 
     if (first_chunk < n) {
       const size_t second_chunk = n - first_chunk;
-      memcpy(dest + first_chunk, buffer + begin, second_chunk * sizeof(T));
-      begin = (begin + second_chunk) % size;
+      memcpy(dest + first_chunk, buffer_ + begin_, second_chunk * sizeof(T));
+      begin_ = (begin_ + second_chunk) % size_;
     }
 
     return n;
   }
  private:
-  T* buffer;
-  size_t size;
-  size_t begin;
-  size_t end;
-  bool wrap;
-  std::mutex mtx;
-  inline size_t getFreeSize() {
+  T* buffer_;
+  size_t size_;
+  size_t begin_;
+  size_t end_;
+  bool wrap_;
+  std::mutex mtx_;
+  inline size_t GetFreeSize() {
     size_t occ = 0;
-    if (end == begin) {
-      occ = wrap ? size : 0;
+    if (end_ == begin_) {
+      occ = wrap_ ? size_ : 0;
     }
-    else if (end > begin) {
-      occ = end - begin;
+    else if (end_ > begin_) {
+      occ = end_ - begin_;
     }
     else {
-      occ = size + end - begin;
+      occ = size_ + end_ - begin_;
     }
-    return size - occ;
+    return size_ - occ;
   }
-  inline size_t getOccupiedSize() {
-    if (end == begin) {
-      return wrap ? size : 0;
+  inline size_t GetOccupiedSize() {
+    if (end_ == begin_) {
+      return wrap_ ? size_ : 0;
     }
-    else if (end > begin) {
-      return end - begin;
+    else if (end_ > begin_) {
+      return end_ - begin_;
     }
     else {
-      return size + end - begin;
+      return size_ + end_ - begin_;
     }
   }
 };
