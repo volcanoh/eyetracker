@@ -28,12 +28,10 @@ include_directories(
   )
 
 set(source
-  src/pupil_tracker.cpp
   src/object.cpp
+  src/pupil_tracker.cpp
   src/camera.cpp
   src/serial.cpp
-  src/lightsensor_datacontroler.cpp
-  src/lightsensor_dataprocessor.cpp
   src/track_object.cpp
   src/object_manager.cpp
   src/eyetracker.cpp
