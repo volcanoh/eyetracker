@@ -6,18 +6,18 @@ public:
 
   Object();
 
-  void getRvec(cv::Matx31d& rv);
-  void setRvec(const cv::Matx31d& rv);
+  void GetRvec(cv::Matx31d& rv);
+  void SetRvec(const cv::Matx31d& rv);
 
-  void getTvec(cv::Matx31d& tv);
-  void setTvec(const cv::Matx31d& tv);
+  void GetTvec(cv::Matx31d& tv);
+  void SetTvec(const cv::Matx31d& tv);
 
   void SetId(int);
   int GetId();
 
 private:
-  cv::Matx31d rvec;
-  cv::Matx31d tvec;
+  cv::Matx31d rvec_;
+  cv::Matx31d tvec_;
 
   int id_;
 };
