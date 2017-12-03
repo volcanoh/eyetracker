@@ -36,7 +36,7 @@ class TrackObject : public Object, public Consumer<LightSensorDataPacket>, publi
     std::vector<cv::Point3d> vertices_;
 
     UsbSerial& usb_serial_;
-    RingBuffer<LightSensorDataPacket> data_packet_;
+    RingBuffer<LightSensorDataPacket>* data_packet_;
     std::vector<std::thread> thread_;
 };
 

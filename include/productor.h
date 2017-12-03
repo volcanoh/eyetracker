@@ -3,7 +3,7 @@
 template<typename T>
 class Productor {
   public:
-    Productor(RingBuffer<T> rb) :
+    Productor(RingBuffer<T>* rb) :
       ringbuffer_(rb) {
         shall_stop_ = true;
       }
@@ -21,7 +21,7 @@ class Productor {
       shall_stop_ = true;
     }
 
-    RingBuffer<T>& ringbuffer_;
+    RingBuffer<T>* ringbuffer_;
   private:
     bool shall_stop_;
 };

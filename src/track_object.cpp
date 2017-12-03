@@ -4,11 +4,8 @@ TrackObject::TrackObject(UsbSerial& usb_serial, const std::vector<cv::Point3d>& 
   Consumer<LightSensorDataPacket>(data_packet_),
   Productor<LightSensorDataPacket>(data_packet_),
   vertices_(vertices),
-  usb_serial_(usb_serial), 
-  data_packet_(packet_size) {
-    cout << "vertices initialized" << endl;
-    cout << "usb serial initialized" << endl;
-    cout << "data packet initialized" << endl;
+  usb_serial_(usb_serial) {
+     data_packet_ = new RingBuffer<LightSensorDataPacket>(packet_size);
   }
 
 bool TrackObject::Product() {
@@ -43,7 +40,7 @@ bool TrackObject::Product() {
   if (CheckDataTail()) {
     LightSensorDataPacket lsdp;
     memcpy(&lsdp, data_ + 2, sizeof(LightSensorDataPacket));
-    if (data_packet_.Write(&lsdp, 1) == 1)
+    if (data_packet_->Write(&lsdp, 1) == 1)
       return true;
     else {
       cerr << "ringbuffer is no free space!" << endl;
@@ -56,7 +53,6 @@ bool TrackObject::Product() {
 }
 
 bool TrackObject::Consume() {
-  cout << "Consume" << std::endl;
   static auto TimetickToAngle = [](unsigned short timetick)->double {
     return timetick / 8333.33 * PI - PI / 2;
   };
@@ -71,7 +67,11 @@ bool TrackObject::Consume() {
   };
   //auto SolverPnP = [&](){
   LightSensorDataPacket light_sensor_data_packet;
-  bool ret = data_packet_.Read(&light_sensor_data_packet, 1);
+  bool ret = data_packet_->Read(&light_sensor_data_packet, 1);
+  if (!ret) {
+    usleep(1);
+    return ret;
+  } 
   cout << light_sensor_data_packet.index << endl;
   std::vector<cv::Point2d> image_points;
   std::vector<cv::Point3d> object_points;

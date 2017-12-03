@@ -26,7 +26,7 @@ bool ReadPoints(std::vector<cv::Point3d>& pts, std::string file) {
   return true;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
 #ifdef __unix
   UsbSerialLinux usb_serial("/dev/ttyUSB0");
 #elif defined _WIN32
@@ -35,7 +35,7 @@ int main() {
   if (!usb_serial.IsOpened()) return -1;
 
   std::vector<cv::Point3d> vertices;
-  string object_points_file = "object_points.txt";
+  string object_points_file(argv[1]);
   if (!ReadPoints(vertices, object_points_file)) {
     cout << "Can not find file: " << object_points_file << endl;
     return -1;

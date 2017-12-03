@@ -5,7 +5,7 @@
 template<typename T>
 class Consumer {
   public:
-    Consumer(RingBuffer<T> rb) :
+    Consumer(RingBuffer<T>* rb) :
       ringbuffer_(rb) {
         shall_stop_ = true;
       }
@@ -24,7 +24,7 @@ class Consumer {
       shall_stop_ = true;
     }
 
-    RingBuffer<T>& ringbuffer_;
+    RingBuffer<T>* ringbuffer_;
   private:
     bool shall_stop_;
 };
