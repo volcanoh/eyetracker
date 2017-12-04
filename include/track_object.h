@@ -17,12 +17,13 @@ class TrackObject : public Object, public Consumer<LightSensorDataPacket>, publi
   public:
 
     TrackObject(UsbSerial& usb_serial, const std::vector<cv::Point3d>& vertices, size_t packet_size = 10, size_t serial_data_size = 154);
+    virtual ~TrackObject();
 
     virtual void Start();
     virtual void Stop();
     virtual bool Product();
     virtual bool Consume();
-    virtual ~TrackObject();
+    virtual void Join();
 
     void SetVertices(const std::vector<cv::Point3d>& vertices);
 

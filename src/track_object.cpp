@@ -51,7 +51,6 @@ bool TrackObject::Product() {
       return true;
     else {
       cerr << "ringbuffer is no free space!" << endl;
-      usleep(1);
       return false;
     }
     return true;
@@ -76,7 +75,6 @@ bool TrackObject::Consume() {
   LightSensorDataPacket light_sensor_data_packet;
   bool ret = data_packet_->Read(&light_sensor_data_packet, 1);
   if (!ret) {
-    usleep(1);
     return ret;
   } 
   cout << light_sensor_data_packet.index << endl;
@@ -110,10 +108,16 @@ void TrackObject::Start() {
   thread_.push_back(std::thread([&]() {
     Productor<LightSensorDataPacket>::Start();
   }));
-  for (auto & it : thread_) it.join();
 }
 
 void TrackObject::Stop() {
   Consumer<LightSensorDataPacket>::Stop();
   Productor<LightSensorDataPacket>::Stop();
+}
+
+void TrackObject::Join() {
+  for (auto & it : thread_) {
+    if (it.joinable())
+      it.join();
+  }
 }

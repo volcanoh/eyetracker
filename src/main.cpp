@@ -27,6 +27,7 @@ bool ReadPoints(std::vector<cv::Point3d>& pts, std::string file) {
 }
 
 int main(int argc, char* argv[]) {
+  if (argc < 4) return -1;
 #ifdef __unix
   UsbSerialLinux usb_serial("/dev/ttyUSB0");
 #elif defined _WIN32
@@ -41,10 +42,17 @@ int main(int argc, char* argv[]) {
     return -1;
   }
   // ObjectManager test
-  cout << "Initializing EyeTracker" << endl;
-  EyeTracker eye_tracker(usb_serial, vertices);
-  cout << "EyeTracker initialized" << endl;
+  std::string left_pupil_config = argv[2];
+  std::string right_pupil_config = argv[3];
+  EyeTracker eye_tracker(usb_serial, vertices, left_pupil_config, right_pupil_config);
+  eye_tracker.SetCamera(EyeTracker::CameraTypes::kLeftEyeCamera, "1.avi");
+  eye_tracker.SetCamera(EyeTracker::CameraTypes::kRightEyeCamera, "2.avi");
+  cout << "Starting lighthouse tracking" << endl;
   eye_tracker.Start();
+  cout << "Starting pupil tracking" << endl;
+  eye_tracker.StartPupilTracking();
+
+  eye_tracker.Join();
 
   usb_serial.Close();
   return 0;
