@@ -9,7 +9,9 @@ class Consumer {
       ringbuffer_(rb) {
         shall_stop_ = true;
       }
-    ~Consumer() {}
+    virtual ~Consumer() {
+      if (ringbuffer_) delete ringbuffer_;
+    }
 
     virtual bool Consume() = 0;
 

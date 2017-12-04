@@ -8,7 +8,6 @@ void Camera::SetCameraMatrix( const cv::Mat &camMat ) {
 }
 
 Camera::Camera(){
-  this->open("1.avi");
 }
 
 Camera::Camera(int device) : cv::VideoCapture(device) {

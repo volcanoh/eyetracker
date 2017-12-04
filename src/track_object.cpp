@@ -1,12 +1,19 @@
 #include "track_object.h"
 
-TrackObject::TrackObject(UsbSerial& usb_serial, const std::vector<cv::Point3d>& vertices, int packet_size) :
+TrackObject::TrackObject(UsbSerial& usb_serial, const std::vector<cv::Point3d>& vertices, size_t packet_size, size_t serial_data_size) :
   Consumer<LightSensorDataPacket>(data_packet_),
   Productor<LightSensorDataPacket>(data_packet_),
   vertices_(vertices),
+  serial_data_size_(serial_data_size),
   usb_serial_(usb_serial) {
      data_packet_ = new RingBuffer<LightSensorDataPacket>(packet_size);
+     data_ = new char[serial_data_size];
   }
+
+TrackObject::~TrackObject() {
+  if (data_packet_) delete data_packet_;
+  if (data_) delete data_;
+}
 
 bool TrackObject::Product() {
   auto  SearchBeginPos = [](char* buffer, const int size) -> int{
@@ -17,24 +24,24 @@ bool TrackObject::Product() {
     return -1;
   };
   auto CheckDataTail = [&]() {
-    if (data_[kSerialDataSize - 4] == '#' &&
-        data_[kSerialDataSize - 3] == '*' &&
-        data_[kSerialDataSize - 2] == '\r' &&
-        data_[kSerialDataSize - 1] == '\n')
+    if (data_[serial_data_size_ - 4] == '#' &&
+        data_[serial_data_size_ - 3] == '*' &&
+        data_[serial_data_size_ - 2] == '\r' &&
+        data_[serial_data_size_ - 1] == '\n')
       return true;
     return false;
   };
 
-  char buffer[kSerialDataSize];
-  usb_serial_.Read(buffer, kSerialDataSize);
-  int begin_pos = SearchBeginPos(buffer, kSerialDataSize);
+  char buffer[serial_data_size_];
+  usb_serial_.Read(buffer, serial_data_size_);
+  int begin_pos = SearchBeginPos(buffer, serial_data_size_);
   if (begin_pos == -1) {
     return false;
   }
   else {
-    memcpy(data_, buffer + begin_pos, kSerialDataSize - begin_pos);
+    memcpy(data_, buffer + begin_pos, serial_data_size_ - begin_pos);
   }
-  int ret = usb_serial_.Read(data_ + kSerialDataSize - begin_pos, begin_pos); // read the rest data.
+  int ret = usb_serial_.Read(data_ + serial_data_size_ - begin_pos, begin_pos); // read the rest data.
   if (!ret) return ret;
 
   if (CheckDataTail()) {
@@ -44,7 +51,6 @@ bool TrackObject::Product() {
       return true;
     else {
       cerr << "ringbuffer is no free space!" << endl;
-      usleep(1);
       return false;
     }
     return true;
@@ -69,7 +75,6 @@ bool TrackObject::Consume() {
   LightSensorDataPacket light_sensor_data_packet;
   bool ret = data_packet_->Read(&light_sensor_data_packet, 1);
   if (!ret) {
-    usleep(1);
     return ret;
   } 
   cout << light_sensor_data_packet.index << endl;
@@ -103,10 +108,16 @@ void TrackObject::Start() {
   thread_.push_back(std::thread([&]() {
     Productor<LightSensorDataPacket>::Start();
   }));
-  for (auto & it : thread_) it.join();
 }
 
 void TrackObject::Stop() {
   Consumer<LightSensorDataPacket>::Stop();
   Productor<LightSensorDataPacket>::Stop();
+}
+
+void TrackObject::Join() {
+  for (auto & it : thread_) {
+    if (it.joinable())
+      it.join();
+  }
 }
