@@ -6,8 +6,16 @@
 
 class EyeTracker : public TrackObject {
   public:
+    enum CameraTypes {
+      kUnknownCamera = -1,
+      kLeftEyeCamera,
+      kRightEyeCamera,
+      kLeftSceneCamera,
+      kRightSceneCamera
+    };
 
-    EyeTracker(UsbSerial& usb_serial, std::vector<cv::Point3d> vertices, int packet_size = 10);
+    EyeTracker(UsbSerial& usb_serial, std::vector<cv::Point3d> vertices, size_t packet_size = 10, size_t serial_data_size = 154, int lec_id = -1, int rec_id = -1, int lsc_id = -1, int rsc_id = -1);
+
     void SetPupilTrackingtALG(std::function<bool(const cv::Mat&, cv::RotatedRect&)> alg);
 
     void GetPupil(cv::RotatedRect& left_pupil, cv::RotatedRect& right_pupil);

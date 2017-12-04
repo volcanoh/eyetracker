@@ -5,9 +5,8 @@
 #include <serial.h>
 #include <ringbuffer.h>
 #include <thread>
-const double PI = 3.1415926;
 
-const int kSerialDataSize = 154;
+const double PI = 3.1415926;
 
 struct LightSensorDataPacket {
   unsigned int index;
@@ -17,26 +16,29 @@ struct LightSensorDataPacket {
 class TrackObject : public Object, public Consumer<LightSensorDataPacket>, public Productor<LightSensorDataPacket> {
   public:
 
-    TrackObject(UsbSerial& usb_serial, const std::vector<cv::Point3d>& vertices, int packet_size = 10);
+    TrackObject(UsbSerial& usb_serial, const std::vector<cv::Point3d>& vertices, size_t packet_size = 10, size_t serial_data_size = 154);
 
     virtual void Start();
     virtual void Stop();
     virtual bool Product();
     virtual bool Consume();
+    virtual ~TrackObject();
 
     void SetVertices(const std::vector<cv::Point3d>& vertices);
 
   private:
-
-    char data_[kSerialDataSize];
 
     cv::Matx31d rvecTrack;
     cv::Matx31d tvecTrack;
 
     std::vector<cv::Point3d> vertices_;
 
+    char* data_;
+    size_t serial_data_size_;
+
     UsbSerial& usb_serial_;
     RingBuffer<LightSensorDataPacket>* data_packet_;
     std::vector<std::thread> thread_;
+
 };
 

@@ -8,6 +8,10 @@ class Productor {
         shall_stop_ = true;
       }
 
+    virtual ~Productor() {
+      if (ringbuffer_) delete ringbuffer_;
+    }
+
     virtual bool Product() = 0;
 
     virtual void Start() {
