@@ -1,6 +1,6 @@
 #include <pupil_tracker.h>
-PupilTracker::PupilTracker(std::string cgf) {
-  parser_.read(cgf);
+PupilTracker::PupilTracker(std::string cfg) {
+  parser_.read(cfg);
   params_.Radius_Min = parser_.get<int>("Radius_Min");
   params_.Radius_Max = parser_.get<int>("Radius_Max");
 

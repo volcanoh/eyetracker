@@ -6,7 +6,7 @@
 
 class PupilTracker {
   public:
-    PupilTracker(std::string cgf);
+    PupilTracker(std::string cfg);
     bool FindPupilEllipse(const cv::Mat& src, cv::RotatedRect& ellipse);
   private:
     pupiltracker::ConfigParser parser_;
