@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
-
 if (NOT MSVC)
   if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
@@ -17,14 +16,13 @@ if (NOT MSVC)
   endif ()
 endif ()
 
-
 find_package(OpenCV REQUIRED)
-find_package(Boost REQUIRED)
+find_package(PCL 1.8 REQUIRED)
 
 include_directories(
   include
   ${OpenCV_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
   )
 
 set(source
@@ -38,10 +36,14 @@ set(source
   src/main.cpp
   )
 
+add_definitions(${PCL_DEFINITIONS})
+
 add_executable(demo ${source})
 
 IF (WIN32)
   target_link_libraries(demo pupiltracker ${OpenCV_LIBS})
+  target_link_libraries(demo ${PCL_LIBS})
 ELSEIF (UNIX)
   target_link_libraries(demo pupiltracker ${OpenCV_LIBS} pthread)
+  target_link_libraries(demo ${PCL_LIBS)
 ENDIF ()
