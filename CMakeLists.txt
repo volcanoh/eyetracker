@@ -34,6 +34,7 @@ set(source
   src/object_manager.cpp
   src/eyetracker.cpp
   src/main.cpp
+  src/viewer.cpp
   )
 
 add_definitions(${PCL_DEFINITIONS})
@@ -42,8 +43,8 @@ add_executable(demo ${source})
 
 IF (WIN32)
   target_link_libraries(demo pupiltracker ${OpenCV_LIBS})
-  target_link_libraries(demo ${PCL_LIBS})
+  target_link_libraries(demo ${PCL_LIBRARIES})
 ELSEIF (UNIX)
   target_link_libraries(demo pupiltracker ${OpenCV_LIBS} pthread)
-  target_link_libraries(demo ${PCL_LIBS)
+  target_link_libraries(demo ${PCL_LIBRARIES})
 ENDIF ()
