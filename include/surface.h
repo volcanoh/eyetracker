@@ -8,8 +8,11 @@ public:
 	Surface(const std::string &name);
 	~Surface();
 
-	void Add(boost::shared_ptr<pcl::visualization::PCLVisualizer>);
+	void AttachTo(boost::shared_ptr<pcl::visualization::PCLVisualizer>);
+	void FillSurface();
+
 private:
+	boost::shared_ptr<pcl::PointCloud<pcl::PointXYZRGB>> point_cloud_;
 };
 
 #endif

@@ -10,8 +10,9 @@ class Visualable {
 public:
 	explicit Visualable(const std::string &name);
 	virtual ~Visualable();
-	virtual void Add(boost::shared_ptr<pcl::visualization::PCLVisualizer>) = 0;
 
+	virtual void AttachTo(boost::shared_ptr<pcl::visualization::PCLVisualizer>) = 0;
+	const std::string &Name() const;
 private:
 	std::string name_;
 };

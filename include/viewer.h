@@ -14,13 +14,16 @@ public:
 
 
 	void AddVisualable(boost::shared_ptr<Visualable> visualable);
-	void FillPointCloud();
+	void SetRenderingProperties(int property, double value, const std::string &id);
+	void AddCoordinateSystem(double scale, float x, float y, float z, const std::string &id);
+	void RemoveCoordinateSystem(const std::string &id);
 	void SetViewerBackground(double r, double g, double b);
-	void AddPointCloudToViewer();
+	void InitCameraParameters();
+	void Spin() const;
 
 private:
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer_;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_;
+	std::map<std::string, boost::shared_ptr<Visualable>> visual_contents_;
 };
 
 
