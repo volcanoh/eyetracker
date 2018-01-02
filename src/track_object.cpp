@@ -32,14 +32,16 @@ bool TrackObject::Product() {
     return false;
   };
 
-  char buffer[serial_data_size_];
+  char *buffer = new char[serial_data_size_];
   usb_serial_.Read(buffer, serial_data_size_);
   int begin_pos = SearchBeginPos(buffer, serial_data_size_);
   if (begin_pos == -1) {
-    return false;
+	delete[] buffer;
+	return false;
   }
   else {
     memcpy(data_, buffer + begin_pos, serial_data_size_ - begin_pos);
+	delete[] buffer;
   }
   int ret = usb_serial_.Read(data_ + serial_data_size_ - begin_pos, begin_pos); // read the rest data.
   if (!ret) return ret;

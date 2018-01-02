@@ -36,4 +36,5 @@ bool ObjectManager::GetTransformation(int id1, int id2, cv::Matx31d& rvec, cv::M
     rvec = it->second.rvec;
     tvec = it->second.tvec;
   }
+  return true;
 }
