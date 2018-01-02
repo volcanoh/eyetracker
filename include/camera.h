@@ -1,6 +1,6 @@
 #pragma once
 #include <opencv2/opencv.hpp>
-#include <object.h>
+#include "object.hpp"
 
 class Camera : public Object, public cv::VideoCapture {
 public:

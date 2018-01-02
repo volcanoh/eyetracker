@@ -1,4 +1,4 @@
-#include "object.h"
+#include "object.hpp"
 
 Object::Object() :
   id_(0) {

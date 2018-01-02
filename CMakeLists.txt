@@ -17,7 +17,7 @@ if (NOT MSVC)
 endif ()
 
 find_package(OpenCV REQUIRED)
-find_package(PCL 1.8 REQUIRED)
+find_package(PCL REQUIRED)
 
 add_definitions(${PCL_DEFINITIONS})
 
@@ -48,6 +48,7 @@ set(source
   src/surface.cpp
   )
 
+IF (WIN32)
 find_library(PUPILTRACKER_LIBRARY
   NAMES "pupiltracker.lib"
   NO_DEFAULT_PATH)
@@ -55,6 +56,9 @@ find_library(PUPILTRACKER_LIBRARY
 find_library(PUPILTRACKER_LIBRARY_DEBUG
   NAMES "pupiltrackerd.lib"
   NO_DEFAULT_PATH)
+ELSEIF (UNIX)
+  set(PUPILTRACKER_LIBRARY pupiltracker)
+ENDIF ()
 
 
 
@@ -62,11 +66,10 @@ add_executable(demo ${source} ${HEADERS})
 
 IF (WIN32)
   target_link_libraries(demo debug ${PUPILTRACKER_LIBRARY_DEBUG})
-  target_link_libraries(demo optimized PUPILTRACKER_LIBRARY)
+  target_link_libraries(demo optimized ${PUPILTRACKER_LIBRARY})
   target_link_libraries(demo ${OpenCV_LIBS})
   target_link_libraries(demo ${PCL_LIBRARIES})
 ELSEIF (UNIX)
-  target_link_libraries(demo debug ${PUPILTRACKER_LIBRARY_DEBUG})
   target_link_libraries(demo optimized ${PUPILTRACKER_LIBRARY})
   target_link_libraries(demo ${OpenCV_LIBS} pthread)
   target_link_libraries(demo ${PCL_LIBRARIES})
