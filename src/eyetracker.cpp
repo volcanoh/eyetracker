@@ -92,12 +92,12 @@ void EyeTracker::StartPupilTracking() {
       if (left_pupil_tracker_.FindPupilEllipse(left_eye_image, left_ellipse)) {
         std::lock_guard<std::mutex> lock(mtx_);
         left_pupil_ = left_ellipse;
-        std::cout << left_pupil_.center << std::endl;
+        //std::cout << left_pupil_.center << std::endl;
       }
       if (right_pupil_tracker_.FindPupilEllipse(right_eye_image, right_ellipse)) {
         std::lock_guard<std::mutex> lock(mtx_);
         right_pupil_ = right_ellipse;
-        std::cout << right_pupil_.center << std::endl;
+        //std::cout << right_pupil_.center << std::endl;
       }
     }
   });
